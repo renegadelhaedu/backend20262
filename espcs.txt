@@ -1,0 +1,195 @@
+# Especificação do sistema web de projetos acadêmicos
+
+## 1. Visão geral
+
+O sistema permite que professores divulguem projetos acadêmicos e que alunos encontrem essas oportunidades e se candidatem para participar. O professor responsável pelo projeto analisa as candidaturas e decide quais alunos serão aceitos.
+
+## 2. Perfis de usuário
+
+### Professor
+
+- Cria uma conta e acessa o sistema com e-mail e senha.
+- Publica projetos acadêmicos informando título, descrição e, opcionalmente, requisitos ou perfil desejado.
+- Consulta projetos publicados por outros professores.
+- Consulta a lista de alunos cadastrados.
+- Acompanha as candidaturas recebidas para os próprios projetos.
+- Aceita ou recusa candidaturas somente nos projetos de sua propriedade.
+
+### Aluno
+
+- Cria uma conta e acessa o sistema com e-mail e senha.
+- Informa nome e, opcionalmente, curso ou área de atuação.
+- Consulta os projetos publicados por todos os professores.
+- Candidata-se a projetos disponíveis.
+- Consulta a situação de suas candidaturas: pendente, aceita ou recusada.
+- Não aprova candidaturas nem administra projetos.
+
+## 3. Regras de negócio
+
+1. Um professor pode publicar vários projetos.
+2. Cada projeto pertence a um único professor.
+3. Um aluno pode candidatar-se a vários projetos.
+4. Um aluno pode ter no máximo uma candidatura por projeto.
+5. Cada candidatura relaciona um aluno a um projeto e possui uma situação: `Pendente`, `Aceita` ou `Recusada`.
+6. Uma candidatura é criada com situação `Pendente`.
+7. Somente o professor proprietário do projeto pode consultar e alterar a situação das candidaturas daquele projeto.
+8. Uma candidatura aceita ou recusada não deve ser duplicada ao reenviar o formulário. O sistema informa que já existe uma candidatura para aquele projeto.
+9. Usuários não autenticados devem entrar ou criar uma conta antes de acessar áreas restritas.
+10. As permissões devem ser verificadas no servidor em cada rota protegida; ocultar um link ou botão na interface não substitui a autorização.
+
+## 4. Requisitos funcionais
+
+### RF01 — Página inicial
+
+Apresentar o propósito do sistema, permitir que usuários entrem e oferecer links para cadastro como professor ou aluno.
+
+### RF02 — Cadastro e autenticação
+
+- Permitir cadastro com nome, e-mail, senha, perfil (professor ou aluno) e curso/área opcional.
+- Impedir o cadastro de e-mail já utilizado.
+- Exigir senha com pelo menos oito caracteres e armazenar somente o hash da senha.
+- Permitir login e encerramento da sessão.
+- Manter a autenticação com `session` do Flask; não utilizar Flask-Login.
+
+### RF03 — Painel do aluno
+
+- Listar todos os projetos publicados, com título, descrição, requisitos, professor responsável e data de publicação.
+- Permitir candidatura a cada projeto.
+- Mostrar a situação da candidatura do aluno em cada projeto ao qual já se candidatou.
+
+### RF04 — Painel do professor
+
+- Listar projetos de todos os professores, identificando os projetos próprios e os da comunidade.
+- Permitir criar e publicar um projeto.
+- Para os projetos próprios, apresentar o número de candidaturas e um acesso à lista de candidatos.
+- Não oferecer ações de aprovação ou recusa em projetos de outros professores.
+
+### RF05 — Candidaturas
+
+- Exibir ao professor proprietário os alunos que se candidataram a cada projeto, incluindo nome, e-mail e curso/área informados.
+- Permitir ao proprietário aceitar ou recusar candidaturas pendentes.
+- Exibir a situação atual da candidatura depois da decisão.
+
+### RF06 — Consulta de alunos
+
+Permitir que professores consultem os alunos cadastrados e suas informações básicas. Esta área deve ser restrita a professores autenticados.
+
+## 5. Requisitos não funcionais
+
+1. A interface deve estar em português do Brasil e adaptar-se a telas de celular e computador.
+2. As páginas devem ser renderizadas no servidor com HTML e CSS, sem JavaScript.
+3. Formulários devem usar métodos HTTP apropriados; ações que alteram dados devem usar `POST`.
+4. Senhas nunca devem ser armazenadas em texto puro.
+5. A chave secreta da sessão deve poder ser configurada por variável de ambiente `SECRET_KEY`.
+6. A conexão com o banco deve poder ser configurada por `DATABASE_URL`, mantendo SQLite como padrão.
+7. A aplicação deve poder ser executada em Linux Debian por Gunicorn.
+8. Erros de autenticação, validação e autorização devem ser informados ou respondidos com códigos HTTP adequados; usuários não devem acessar dados ou ações sem permissão.
+
+## 6. Modelo de dados
+
+### User
+
+- `id`: chave primária.
+- `name`: nome do usuário.
+- `email`: e-mail único usado no login.
+- `password_hash`: hash da senha.
+- `role`: perfil (`professor` ou `student`).
+- `course`: curso ou área de atuação opcional.
+
+### Project
+
+- `id`: chave primária.
+- `title`: título do projeto.
+- `description`: descrição do projeto.
+- `requirements`: requisitos ou perfil desejado, opcional.
+- `created_at`: data e hora de publicação.
+- `owner_id`: chave estrangeira para o professor proprietário.
+
+### Application
+
+- `id`: chave primária.
+- `student_id`: chave estrangeira para o aluno.
+- `project_id`: chave estrangeira para o projeto.
+- `status`: situação (`Pendente`, `Aceita` ou `Recusada`).
+- `created_at`: data e hora da candidatura.
+- Restrição única composta por `student_id` e `project_id`.
+
+Relacionamentos: um professor possui muitos projetos; um projeto recebe muitas candidaturas; um aluno pode enviar muitas candidaturas. A tabela `Application` representa a relação muitos-para-muitos entre alunos e projetos e guarda os dados próprios da candidatura.
+
+## 7. Arquitetura da aplicação
+
+Usar o padrão **Controllers, Services e Repositories**, mantendo modelos e configuração do banco separados:
+
+```text
+app.py
+banco.py
+models.py
+controllers/
+  auth_controller.py
+  main_controller.py
+  professor_controller.py
+  helpers.py
+services/
+  auth_service.py
+  project_service.py
+  application_service.py
+repositories/
+  user_repository.py
+  project_repository.py
+  application_repository.py
+templates/
+static/
+```
+
+### Responsabilidades das camadas
+
+- `app.py`: criar a aplicação com uma fábrica `create_app()`, carregar configurações, inicializar extensões e registrar blueprints.
+- `banco.py`: declarar a instância SQLAlchemy e configurar a conexão a partir de `DATABASE_URL`.
+- `models.py`: declarar as entidades e seus relacionamentos; não importar `app.py`.
+- `controllers/`: declarar as rotas em blueprints, receber requisições, validar o perfil de acesso, chamar serviços e escolher a resposta ou template. Cada arquivo de controller deve possuir sua própria blueprint.
+- `services/`: implementar regras de negócio e validações, sem depender de objetos de requisição ou resposta do Flask.
+- `repositories/`: concentrar consultas e operações de persistência usando os modelos e a sessão do SQLAlchemy.
+- `templates/` e `static/`: conter, respectivamente, templates HTML Jinja e arquivos CSS.
+
+### Dependências e inicialização
+
+- A instância `db` deve ser declarada em `banco.py` sem estar vinculada a uma aplicação específica.
+- `create_app()` configura e associa `db` à aplicação, importa os modelos para registrá-los e, então, registra as blueprints.
+- Controllers, services, repositories e models não devem importar `app.py`. Isso evita importações circulares.
+- A aplicação deve expor `app` para execução por Gunicorn (`app:app`).
+
+## 8. Tecnologias
+
+- Python 3.
+- Flask para a aplicação web e sessões.
+- Flask-SQLAlchemy e SQLAlchemy para ORM e persistência.
+- SQLite como banco padrão.
+- HTML5, templates Jinja e CSS3 para a interface.
+- Gunicorn como servidor WSGI em produção no Debian.
+- Não usar Flask-Login.
+- Não usar JavaScript.
+- Não usar o arquivo `dotnevespcs.txt` como especificação ou configuração do projeto.
+
+## 9. Execução e configuração
+
+Instalação local:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python3 app.py
+```
+
+Execução com Gunicorn:
+
+```bash
+export SECRET_KEY='defina-uma-chave-secreta-forte'
+gunicorn --bind 0.0.0.0:8000 app:app
+```
+
+Configurações:
+
+- `SECRET_KEY`: chave usada para assinar os cookies de sessão; obrigatória em produção.
+- `DATABASE_URL`: URL de conexão SQLAlchemy. Se omitida, usar SQLite local.
+

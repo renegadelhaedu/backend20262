@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Projeto Aberto{% endblock %} · Projeto Aberto</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('main.index') }}"><span class="brand-mark">P</span> Projeto Aberto</a>
+    <nav aria-label="Navegação principal">
+      {% if current_user %}
+        <a href="{{ url_for('main.dashboard') }}">Painel</a>
+        <a href="{{ url_for('main.students') }}">Alunos</a>
+        <span class="nav-user">{{ current_user.name }}</span>
+        <form class="inline-form" action="{{ url_for('auth.logout') }}" method="post"><button class="nav-button">Sair</button></form>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}">Entrar</a>
+        <a class="nav-cta" href="{{ url_for('auth.register', role='student') }}">Criar conta</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer"><span>Projeto Aberto</span><span>Ideias acadêmicas que crescem em conjunto.</span></footer>
+</body>
+</html>
