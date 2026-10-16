@@ -2,7 +2,8 @@
 
 ## 1. Visão geral
 
-O sistema permite que professores divulguem projetos acadêmicos e que alunos encontrem essas oportunidades e se candidatem para participar. O professor responsável pelo projeto analisa as candidaturas e decide quais alunos serão aceitos.
+O sistema permite que professores divulguem projetos acadêmicos e que alunos encontrem essas oportunidades e se candidatem para participar. 
+O professor responsável pelo projeto analisa as candidaturas e decide quais alunos serão aceitos.
 
 ## 2. Perfis de usuário
 

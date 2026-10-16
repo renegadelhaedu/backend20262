@@ -1,1 +1,58 @@
-{% extends 'base.html' %}{% block title %}Projetos disponíveis{% endblock %}{% block content %}<section class="page-heading"><div><span class="eyebrow">ESPAÇO DO ALUNO</span><h1>Encontre seu próximo projeto.</h1><p>Explore oportunidades e candidate-se para aprender fazendo.</p></div><span class="heading-decoration">✳</span></section><section class="content-section"><div class="section-heading compact"><h2>Projetos disponíveis <span class="count">{{ projects|length }}</span></h2></div>{% if projects %}<div class="project-grid">{% for project in projects %}<article class="project-card"><div class="project-meta"><span class="pill">PROJETO ACADÊMICO</span><span>{{ project.created_at.strftime('%d/%m/%Y') }}</span></div><h3>{{ project.title }}</h3><p>{{ project.description }}</p>{% if project.requirements %}<div class="requirements"><strong>Sobre a participação</strong><p>{{ project.requirements }}</p></div>{% endif %}<div class="project-bottom"><span>Por {{ project.owner.name }}</span>{% if applications.get(project.id) %}<span class="status status-{{ applications[project.id].status|lower }}">{{ applications[project.id].status }}</span>{% else %}<form action="{{ url_for('main.apply', project_id=project.id) }}" method="post"><button class="card-link button-link">Quero participar →</button></form>{% endif %}</div></article>{% endfor %}</div>{% else %}<div class="empty-state"><span class="empty-icon">↗</span><h3>Novas oportunidades em breve.</h3><p>Quando os professores publicarem projetos, eles aparecerão aqui.</p></div>{% endif %}</section>{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Projetos disponíveis{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <span class="eyebrow">ESPAÇO DO ALUNO</span>
+      <h1>Encontre seu próximo projeto.</h1>
+      <p>Explore oportunidades e candidate-se para aprender fazendo.</p>
+    </div>
+    <span class="heading-decoration">✳</span>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading compact">
+      <h2>Projetos disponíveis <span class="count">{{ projects|length }}</span></h2>
+    </div>
+    {% if projects %}
+      <div class="project-grid">
+        {% for project in projects %}
+          <article class="project-card">
+            <div class="project-meta">
+              <span class="pill">PROJETO ACADÊMICO</span>
+              <span>{{ project.created_at.strftime('%d/%m/%Y') }}</span>
+            </div>
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.description }}</p>
+            {% if project.requirements %}
+              <div class="requirements">
+                <strong>Sobre a participação</strong>
+                <p>{{ project.requirements }}</p>
+              </div>
+            {% endif %}
+            <div class="project-bottom">
+              <span>Por {{ project.owner.name }}</span>
+              {% if applications.get(project.id) %}
+                <span class="status status-{{ applications[project.id].status|lower }}">
+                  {{ applications[project.id].status }}
+                </span>
+              {% else %}
+                <form action="{{ url_for('main.apply', project_id=project.id) }}" method="post">
+                  <button class="card-link button-link">Quero participar →</button>
+                </form>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-icon">↗</span>
+        <h3>Novas oportunidades em breve.</h3>
+        <p>Quando os professores publicarem projetos, eles aparecerão aqui.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

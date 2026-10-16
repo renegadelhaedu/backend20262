@@ -1,1 +1,37 @@
-{% extends 'base.html' %}{% block title %}Alunos{% endblock %}{% block content %}<section class="page-heading"><div><span class="eyebrow">COMUNIDADE ACADÊMICA</span><h1>Alunos da plataforma.</h1><p>Conheça as pessoas interessadas em participar dos projetos.</p></div></section><section class="content-section"><div class="section-heading compact"><h2>Alunos cadastrados <span class="count">{{ students|length }}</span></h2></div>{% if students %}<div class="people-grid">{% for student in students %}<article class="person-card"><div class="avatar">{{ student.name[0]|upper }}</div><div><h3>{{ student.name }}</h3><p>{{ student.course or 'Área não informada' }}</p></div></article>{% endfor %}</div>{% else %}<div class="empty-state"><h3>A comunidade está começando.</h3><p>Os alunos cadastrados aparecerão aqui.</p></div>{% endif %}</section>{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Alunos{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <span class="eyebrow">COMUNIDADE ACADÊMICA</span>
+      <h1>Alunos da plataforma.</h1>
+      <p>Conheça as pessoas interessadas em participar dos projetos.</p>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading compact">
+      <h2>Alunos cadastrados <span class="count">{{ students|length }}</span></h2>
+    </div>
+    {% if students %}
+      <div class="people-grid">
+        {% for student in students %}
+          <article class="person-card">
+            <div class="avatar">{{ student.name[0]|upper }}</div>
+            <div>
+              <h3>{{ student.name }}</h3>
+              <p>{{ student.course or 'Área não informada' }}</p>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <h3>A comunidade está começando.</h3>
+        <p>Os alunos cadastrados aparecerão aqui.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

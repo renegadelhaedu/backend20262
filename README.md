@@ -13,6 +13,15 @@ Aplicação Flask para professores publicarem projetos acadêmicos e alunos se c
 
 As camadas não importam `app.py`. A extensão é declarada em `banco.py` e conectada à aplicação pela fábrica `create_app()`, evitando importações circulares.
 
+## API de consulta
+
+A blueprint `controllers/api_controller.py` disponibiliza endpoints HTTP somente de leitura que retornam JSON:
+
+- `GET /api/projetos`: lista projetos com título, descrição, requisitos, data de publicação e nome/ID do professor.
+- `GET /api/alunos`: lista alunos com ID, nome e curso.
+
+Esses endpoints não usam JWT nem outra autenticação. Restrinja o acesso ao servidor por firewall ou proxy para que fique disponível somente às máquinas e redes autorizadas. A resposta de alunos omite e-mail e outros dados de conta.
+
 ## Executar localmente
 
 ```bash

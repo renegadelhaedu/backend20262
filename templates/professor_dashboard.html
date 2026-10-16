@@ -1,1 +1,58 @@
-{% extends 'base.html' %}{% block title %}Painel do professor{% endblock %}{% block content %}<section class="page-heading"><div><span class="eyebrow">ESPAÇO DO PROFESSOR</span><h1>Projetos acadêmicos.</h1><p>Conheça as propostas da comunidade e acompanhe as candidaturas dos seus projetos.</p></div><a class="button button-primary" href="{{ url_for('professor.create_project') }}">＋ Novo projeto</a></section><section class="content-section"><div class="section-heading compact"><h2>Projetos publicados <span class="count">{{ projects|length }}</span></h2></div>{% if projects %}<div class="project-grid">{% for project in projects %}<article class="project-card"><div class="project-meta"><span class="pill">{{ 'SEU PROJETO' if project.owner_id == current_user.id else 'PROJETO DA COMUNIDADE' }}</span><span>{{ project.created_at.strftime('%d/%m/%Y') }}</span></div><h3>{{ project.title }}</h3><p>{{ project.description|truncate(180) }}</p><div class="project-bottom"><span>Por {{ project.owner.name }}{% if project.owner_id == current_user.id %} · {{ project.applications|length }} candidatura(s){% endif %}</span>{% if project.owner_id == current_user.id %}<a href="{{ url_for('professor.project_applications', project_id=project.id) }}">Ver candidaturas →</a>{% endif %}</div></article>{% endfor %}</div>{% else %}<div class="empty-state"><span class="empty-icon">✳</span><h3>Sua próxima ideia começa aqui.</h3><p>Publique seu primeiro projeto para encontrar alunos interessados em colaborar.</p><a class="button button-primary" href="{{ url_for('professor.create_project') }}">Publicar um projeto</a></div>{% endif %}</section>{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Painel do professor{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <span class="eyebrow">ESPAÇO DO PROFESSOR</span>
+      <h1>Projetos acadêmicos.</h1>
+      <p>Conheça as propostas da comunidade e acompanhe as candidaturas dos seus projetos.</p>
+    </div>
+    <a class="button button-primary" href="{{ url_for('professor.create_project') }}">＋ Novo projeto</a>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading compact">
+      <h2>Projetos publicados <span class="count">{{ projects|length }}</span></h2>
+    </div>
+    {% if projects %}
+      <div class="project-grid">
+        {% for project in projects %}
+          <article class="project-card">
+            <div class="project-meta">
+              <span class="pill">
+                {{ 'SEU PROJETO' if project.owner_id == current_user.id else 'PROJETO DA COMUNIDADE' }}
+              </span>
+              <span>{{ project.created_at.strftime('%d/%m/%Y') }}</span>
+            </div>
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.description|truncate(180) }}</p>
+            <div class="project-bottom">
+              <span>
+                Por {{ project.owner.name }}
+                {% if project.owner_id == current_user.id %}
+                  · {{ project.applications|length }} candidatura(s)
+                {% endif %}
+              </span>
+              {% if project.owner_id == current_user.id %}
+                <a href="{{ url_for('professor.project_applications', project_id=project.id) }}">
+                  Ver candidaturas →
+                </a>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-icon">✳</span>
+        <h3>Sua próxima ideia começa aqui.</h3>
+        <p>Publique seu primeiro projeto para encontrar alunos interessados em colaborar.</p>
+        <a class="button button-primary" href="{{ url_for('professor.create_project') }}">
+          Publicar um projeto
+        </a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

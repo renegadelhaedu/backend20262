@@ -1,0 +1,16 @@
+# Ambientes virtuais Python
+.venv/
+venv/
+env/
+
+# Cache e arquivos compilados do Python
+__pycache__/
+*.py[cod]
+
+# Bancos de dados locais (inclui projetos.db)
+*.db
+*.sqlite
+*.sqlite3
+
+# Banco SQLite criado dentro da pasta padrão do Flask
+/instance/
