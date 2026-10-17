@@ -28,6 +28,7 @@ def listar_projetos():
 @api_bp.get("/alunos")
 def listar_alunos():
     alunos = user_repository.listar_alunos()
+
     return jsonify([
         {
             "id": aluno.id,

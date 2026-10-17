@@ -8,7 +8,7 @@ db = SQLAlchemy()
 '''
 Se for usar postgresql:
 pip install "psycopg[binary]"
-export DATABASE_URL="postgresql+psycopg://usuario:senha@localhost:5432/nome_do_banco"
+export DATABASE_URL="postgresql+psycopg://postgres:12345@192.168.25.114:5432/projeto20262"
 
 '''
 

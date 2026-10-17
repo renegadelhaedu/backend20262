@@ -41,3 +41,18 @@ gunicorn --bind 0.0.0.0:8000 app:app
 ```
 
 Por padrão, SQLite grava o banco em `instance/projetos.db`. Para usar outro endereço, configure `DATABASE_URL`, por exemplo `sqlite:////caminho/absoluto/projetos.db`.
+
+## Deploy com Docker Compose e PostgreSQL
+
+Na máquina de deploy, clone o projeto, copie `.env.example` para `.env`, troque `POSTGRES_PASSWORD` e `SECRET_KEY` por valores fortes e inicie os serviços:
+
+```bash
+cp .env.example .env
+# Edite .env antes de iniciar. Uma senha hexadecimal gerada por `openssl rand -hex 24`
+# é adequada aqui, pois a senha faz parte da URL de conexão.
+docker compose up -d --build
+```
+
+A aplicação fica disponível na porta definida por `APP_PORT` (8000 por padrão). O PostgreSQL não publica sua porta para a rede: só a aplicação no Compose o acessa. Os dados ficam no volume nomeado `postgres_data`; `docker compose down` preserva o volume. Para apagar o banco junto com os containers, seria necessário remover explicitamente esse volume.
+
+O Compose limita a aplicação a 256 MB e o PostgreSQL a 512 MB, com um worker Gunicorn e parâmetros modestos para uma máquina de 1 GB. Ajuste esses limites se o sistema encerrar algum container por falta de memória. Faça backups regulares do banco.
